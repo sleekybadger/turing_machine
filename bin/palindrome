@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+
+states = {
+  # Initial
+  1 => [
+    ['0', [:write, nil], [:move, :right], 2],
+    ['1', [:write, nil], [:move, :right], 4],
+    ['_', 8]
+  ],
+
+  # Zero
+  2 => [
+    ['_', [:move, :left], 3],
+    ['*', [:move, :right], 2]
+  ],
+  3 => [
+    ['0', [:write, nil], [:move, :left], 6],
+    ['_', 8],
+    ['*', 9]
+  ],
+
+  # One
+  4 => [
+    ['_', [:move, :left], 5],
+    ['*', [:move, :right], 4]
+  ],
+  5 => [
+    ['1', [:write, nil], [:move, :left], 6],
+    ['_', 8],
+    ['*', 9]
+  ],
+
+  # Move to left and run again
+  6 => [
+    ['_', 8],
+    ['*', [:move, :left], 7]
+  ],
+  7 => [
+    ['*', [:move, :left], 7],
+    ['_', [:move, :right], 1]
+  ],
+
+  # Success
+  8 => [
+    ['_', [:write, 1], 0]
+  ],
+
+  # Failure
+  9 => [
+    ['*', [:move, :right], 9],
+    ['_', [:move, :left], 10]
+  ],
+  10 => [
+    ['*', [:write, nil], [:move, :left], 10],
+    ['_', [:write, 0], 0]
+  ]
+}
+
+require_relative './../lib/turing_machine'
+
+machine = TuringMachine::Machine.build
+
+machine.write(ARGV[0])
+states.each { |(id, scheme)| machine.register(id, scheme) }
+
+machine.run
+puts machine.results
